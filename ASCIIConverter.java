@@ -5,13 +5,26 @@ import java.io.IOException;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 
+/**
+*ASCIIConverter is a class used to generate ASCII art from an image.
+*
+*@author	Toby Flynn
+*/
 public class ASCIIConverter {
 	private final char[] characterSet = {'@', '%', '#', '*', '+', '=', '-', ':', '.', ' '};
 	private ImageLoader imageLoader;
 	
+	/**
+	*Method that converts an input image to ASCII art using a specified resolution.
+	*
+	*@param		imageFilename	the filename (or path) of the input image
+	*@param		outputFilename	the filename (or path) of the output text file
+	*@param		blockW			the block width (related to the resolution)
+	*@param		blockH			the block height (related to the resolution)
+	*/
 	public void convert(String imageFilename, String outputFilename, int blockW, int blockH) {
 		imageLoader = new ImageLoader(imageFilename);
-		BufferedImage grayscale = imageLoader.getGrayScale();
+		BufferedImage grayscale = imageLoader.getGrayscale();
 		try {
 			FileWriter fileWriter = new FileWriter(outputFilename);
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
@@ -29,6 +42,14 @@ public class ASCIIConverter {
 		}
 	}
 	
+	/**
+	*Method that gets the average colour in a block (related to resolution) of the image.
+	*
+	*@param		width		the width of a block
+	*@param		height		the height of a block
+	*@param		image		the grayscale BufferedImage
+	*@return				a 2D array of average colours in each block
+	*/
 	public int[][] getBlocks(int width, int height, BufferedImage image) {
 		int[][] result = new int[(image.getWidth() / width) + 1][(image.getHeight() / height) + 1];
 		int resX = 0;
@@ -38,12 +59,14 @@ public class ASCIIConverter {
 			int total = 0;
 			//Cycle through all columns
 			for(int x = 0; x < image.getWidth(); x++){
+				//If at end of block record the average and reset the total
 				if(x % width == 0 && (x != 0 || y != 0)){
 					result[resX++][resY] = total / (width * height);
 					total = 0;
 				}
 				//Cycle through all rows in this column that are in this block
 				for(int n = y; n < y + height && n < image.getHeight(); n++){
+					//Add this colour to the total
 					Color colour = new Color(image.getRGB(x, n));
 					total += colour.getRed();
 				}
